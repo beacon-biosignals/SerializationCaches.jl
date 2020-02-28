@@ -1,0 +1,6 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+SerializationCaches = "3f9d9eeb-f6fe-486e-aab5-ad2c1ff40024"
+
+[compat]
+Documenter = "~0.22"
