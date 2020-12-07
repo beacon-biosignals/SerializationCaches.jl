@@ -1,7 +1,7 @@
 name = "SerializationCaches"
 uuid = "3f9d9eeb-f6fe-486e-aab5-ad2c1ff40024"
 authors = ["Beacon Biosignals, Inc."]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
