@@ -3,11 +3,10 @@ module SerializationCaches
 using Serialization
 using OrderedCollections
 
-export SerializationCache, fetch!, put!
+export SerializationCache, fetch!, put!, set_up_cache_path
 
 """
-    SerializationCache{T}(path::AbstractString; in_memory_limit,
-                          file_limit, file_gc_ratio)
+    SerializationCache{T}(path; in_memory_limit, file_limit, file_gc_ratio)
 
 Return a `SerializationCache` instance that holds elements of type `T`.
 
@@ -31,24 +30,36 @@ construction are considered to be part of constructed cache.
 See also: [`fetch!`](@ref), [`put!`](@ref)
 """
 struct SerializationCache{T}
-    path::String
+    path::Any
     file_keys::OrderedSet{String}
     file_gc_ratio::Float64
     file_limit::Int
     in_memory::OrderedDict{String,T}
     in_memory_limit::Int
-    function SerializationCache{T}(path::AbstractString; in_memory_limit,
-                                   file_limit, file_gc_ratio) where {T}
-        path = rstrip(abspath(path), '/')
-        isdir(path) || mkpath(path)
+    function SerializationCache{T}(path; in_memory_limit, file_limit,
+                                   file_gc_ratio) where {T}
+        path = set_up_cache_path(path)
         file_keys = OrderedSet{String}(first(splitext(name)) for name in readdir(path)
                                        if endswith(name, ".jls"))
-        return new{T}(path, file_keys, file_gc_ratio, file_limit,
-                      OrderedDict{String,T}(), in_memory_limit)
+        return new{T}(path, file_keys, file_gc_ratio, file_limit, OrderedDict{String,T}(),
+                      in_memory_limit)
     end
 end
 
 SerializationCache(args...; kwargs...) = SerializationCache{Any}(args...; kwargs...)
+
+"""
+    set_up_cache_path(path::AbstractString)
+
+Return the `SerializationCache`-ready `path`. For input type `AbstractString`,
+creates `path` if it is not already a directory. Can be extended to support
+other types of (e.g., AWSS3.jl's `S3Path`).
+"""
+function set_up_cache_path(path::AbstractString)
+    path = rstrip(abspath(path), '/')
+    isdir(path) || mkpath(path)
+    return path
+end
 
 """
     fetch!(f, cache::SerializationCache, key::AbstractString)
