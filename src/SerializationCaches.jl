@@ -27,7 +27,10 @@ process is determined by `file_gc_ratio`.
 Note that all `.jls` files in `path` at the time of `SerializationCache`
 construction are considered to be part of constructed cache.
 
-See also: [`fetch!`](@ref), [`put!`](@ref)
+A valid method for function [`set_up_cache_path(path)`](@ref) must exist for the
+given `path`; only `set_up_cache_path(::AbstractString)` currently exists.
+
+See also: [`fetch!`](@ref), [`put!`](@ref), [`set_up_cache_path`](@ref)
 """
 struct SerializationCache{T}
     path::Any
