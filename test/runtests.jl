@@ -37,5 +37,7 @@ using Test, SerializationCaches, OrderedCollections
         end
         @test all(keys(cache.in_memory) .== ["29", "30", "31", "32", "33"])
         @test cache.file_keys == OrderedSet(["19", "20", "21", "22", "23", "24", "25", "26", "27", "28"])
+
+        @test isdir(set_up_cache_path(joinpath(tmp, "big/made/up/path")))
     end
 end
