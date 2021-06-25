@@ -87,6 +87,7 @@ function fetch!(f, cache::SerializationCache, key::AbstractString)
         item = deserialize(joinpath(cache.path, key * ".jls"))
         delete!(cache.file_keys, key) # re-prioritize `key`
         push!(cache.file_keys, key)
+        cache.in_memory_limit == 0 && return item
     else
         item = f()
     end
