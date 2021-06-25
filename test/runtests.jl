@@ -62,7 +62,7 @@ end
 
         # Set up cache
         cache = SerializationCache(tmp; in_memory_limit=0,
-                                   file_limit, file_gc_ratio)
+                                   file_limit=file_limit, file_gc_ratio=file_gc_ratio)
 
         # Now test that `fetch!()` never calls `put`, since it should be able to
         # grab all files
