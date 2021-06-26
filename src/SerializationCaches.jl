@@ -36,7 +36,7 @@ struct SerializationCache{T}
     path::Any
     file_keys::OrderedSet{String}
     file_gc_ratio::Float64
-    file_limit::Int
+    file_limit::Union{Int,Nothing}
     in_memory::OrderedDict{String,T}
     in_memory_limit::Int
     function SerializationCache{T}(path; in_memory_limit, file_limit,
