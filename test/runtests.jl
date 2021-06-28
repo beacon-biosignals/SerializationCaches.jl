@@ -42,9 +42,13 @@ using Test, SerializationCaches, OrderedCollections, Serialization
     end
 end
 
+struct NoFile
+    i::Int
+end
+
 # Test that when `in_memory_limit` is 0, deserializing an existing file does not
 # (redundantly) call `put`
-function Base.put!(cache::SerializationCache, key::AbstractString, item;
+function Base.put!(cache::SerializationCache, key::AbstractString, item::NoFile;
                    directly_to_file::Bool=false)
    throw(error("Should not hit this!"))
 end
@@ -57,7 +61,7 @@ end
         # Set up existing cache
         range = 1:file_limit
         for i in range
-            serialize(joinpath(tmp, "$i.jls"), i)
+            serialize(joinpath(tmp, "$i.jls"), NoFile(i))
         end
 
         # Set up cache
@@ -67,7 +71,7 @@ end
         # Now test that `fetch!()` never calls `put`, since it should be able to
         # grab all files
         for i in range
-            @test i == fetch!(() -> (@error "shouldn't need to call this..."), cache, string(i))
+            @test NoFile(i) == fetch!(() -> (error("shouldn't need to call this...")), cache, string(i))
         end
     end
 end
