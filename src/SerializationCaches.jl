@@ -87,6 +87,7 @@ function fetch!(f, cache::SerializationCache, key::AbstractString)
         item = deserialize(joinpath(cache.path, key * ".jls"))
         delete!(cache.file_keys, key) # re-prioritize `key`
         push!(cache.file_keys, key)
+        cache.in_memory_limit == 0 && return item
     else
         item = f()
     end
@@ -106,7 +107,7 @@ Note that `key` must be a valid file name.
 """
 function Base.put!(cache::SerializationCache, key::AbstractString, item;
                    directly_to_file::Bool=false)
-    if directly_to_file
+    if directly_to_file || cache.in_memory_limit == 0
         _file_layer_put!(cache, key, item)
     else
         haskey(cache.in_memory, key) && delete!(cache.in_memory, key) # re-prioritize 'key'

@@ -1,4 +1,4 @@
-using Test, SerializationCaches, OrderedCollections
+using Test, SerializationCaches, OrderedCollections, Serialization
 
 @testset "`SerializationCache`" begin
     mktempdir() do tmp
@@ -38,6 +38,40 @@ using Test, SerializationCaches, OrderedCollections
         @test cache.file_keys == OrderedSet(["19", "20", "21", "22", "23", "24", "25", "26", "27", "28"])
 
         @test isdir(set_up_cache_path(joinpath(tmp, "big/made/up/path")))
+    end
+end
+
+struct NoFile
+    i::Int
+end
+
+# Test that when `in_memory_limit` is 0, deserializing an existing file does not
+# (redundantly) call `put`
+function Base.put!(cache::SerializationCache, key::AbstractString, item::NoFile;
+                   directly_to_file::Bool=false)
+   throw(error("Should not hit this!"))
+end
+
+@testset "No in_memory_limit" begin
+    mktempdir() do tmp
+        in_memory_limit = 0
+        file_limit, file_gc_ratio = 10, 0.1
+
+        # Set up existing cache
+        range = 1:file_limit
+        for i in range
+            serialize(joinpath(tmp, "$i.jls"), NoFile(i))
+        end
+
+        # Set up cache
+        cache = SerializationCache(tmp; in_memory_limit=0,
+                                   file_limit=file_limit, file_gc_ratio=file_gc_ratio)
+
+        # Now test that `fetch!()` never calls `put`, since it should be able to
+        # grab all files
+        for i in range
+            @test NoFile(i) == fetch!(() -> (error("shouldn't need to call this...")), cache, string(i))
+        end
     end
 end
 
