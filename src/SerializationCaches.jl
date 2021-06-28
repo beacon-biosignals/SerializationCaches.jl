@@ -135,7 +135,7 @@ function _file_layer_put!(cache::SerializationCache, key, item)
     end
     push!(cache.file_keys, key)
     file_count = length(cache.file_keys)
-    if file_count > cache.file_limit
+    if !isnothing(cache.file_limit) && file_count > cache.file_limit
         delete_count = cache.file_gc_ratio * file_count
         for _ in 1:clamp(floor(Int, delete_count), 1, file_count)
             rm(joinpath(cache.path, _popfirst!(cache.file_keys) * ".jls"))
