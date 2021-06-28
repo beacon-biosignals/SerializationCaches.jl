@@ -7,8 +7,7 @@ using Test, SerializationCaches, OrderedCollections
         total_limit = in_memory_limit + file_limit
         offset = 3
         cache = SerializationCache(tmp; in_memory_limit=in_memory_limit,
-                                   file_limit=file_limit,
-                                   file_gc_ratio=file_gc_ratio)
+                                   file_limit=file_limit, file_gc_ratio=file_gc_ratio)
         range = 1:(total_limit + offset)
         for i in range
             @test i == fetch!(() -> i, cache, string(i))
@@ -42,13 +41,11 @@ using Test, SerializationCaches, OrderedCollections
     end
 end
 
-
 @testset "No `file_limit`" begin
     mktempdir() do tmp
         in_memory_limit = 0
         cache_file_limit_5 = SerializationCache(tmp; in_memory_limit=in_memory_limit,
-                                                file_limit=5,
-                                                file_gc_ratio=0.1)
+                                                file_limit=5, file_gc_ratio=0.1)
         range = 1:10
         for i in range
             @test i == fetch!(() -> i, cache_file_limit_5, string(i))
@@ -59,8 +56,7 @@ end
     mktempdir() do tmp
         in_memory_limit = 0
         cache_no_file_limit = SerializationCache(tmp; in_memory_limit=in_memory_limit,
-                                                 file_limit=nothing,
-                                                 file_gc_ratio=0.1)
+                                                 file_limit=nothing, file_gc_ratio=0.1)
         range = 1:10
         for i in range
             @test i == fetch!(() -> i, cache_no_file_limit, string(i))
