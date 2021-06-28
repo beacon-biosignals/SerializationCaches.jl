@@ -41,3 +41,30 @@ using Test, SerializationCaches, OrderedCollections
         @test isdir(set_up_cache_path(joinpath(tmp, "big/made/up/path")))
     end
 end
+
+
+@testset "No `file_limit`" begin
+    mktempdir() do tmp
+        in_memory_limit = 0
+        cache_file_limit_5 = SerializationCache(tmp; in_memory_limit=in_memory_limit,
+                                                file_limit=5,
+                                                file_gc_ratio=0.1)
+        range = 1:10
+        for i in range
+            @test i == fetch!(() -> i, cache_file_limit_5, string(i))
+        end
+        @test length(readdir(cache_file_limit_5.path)) == 5
+    end
+
+    mktempdir() do tmp
+        in_memory_limit = 0
+        cache_no_file_limit = SerializationCache(tmp; in_memory_limit=in_memory_limit,
+                                                 file_limit=nothing,
+                                                 file_gc_ratio=0.1)
+        range = 1:10
+        for i in range
+            @test i == fetch!(() -> i, cache_no_file_limit, string(i))
+        end
+        @test length(readdir(cache_no_file_limit.path)) == length(range)
+    end
+end
